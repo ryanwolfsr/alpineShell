@@ -1,0 +1,39 @@
+#################################################################################
+# ClusterIP Service
+# Description: Receives the payload from Slack request and forwards to deployment
+#################################################################################
+apiVersion: v1                          # Each API version defines a different set of 'objects' we can use                   
+kind: Service                           # Type of Object we're creating (i.e. StatefulSet, ReplicaController, Pod, Service)  
+metadata:
+  name: alpineShell-clusterip-service
+spec:
+  type: ClusterIP                       # Types of services: ClusterIP, NodePort, LoadBalancer, Ingress
+  ports:                                # <port>:<targetPort>
+    - port: 3000                        # Port that another POD/Container use to access client pod
+      targetPort: 3000                  # Target port is the port inside the POD to open traffic 
+  selector:
+    component: web                      # Label selector system, associates the service with the Pods that have metadata > labels to this component
+---
+#################################################################################
+# alpineShell Deployment
+# Description: Deployment of containers that will run the shell script
+#################################################################################
+apiVersion: apps/v1                          # Each API version defines a different set of 'objects' we can use 
+kind: Deployment                             # Type of Object we're creating (i.e. StatefulSet, ReplicaController, Pod, Service)
+metadata:                               
+  name: alpineShell-deployment               # Name of the deployment
+spec:
+  replicas: 3                                # How many Pods to run
+  selector:
+    matchLabels:
+      component: web                         # Which template to use for these pods (Listed below)
+  template:                                  # Configuration to be used by all PODS in this deployment
+    metadata:
+      labels:
+         component: web                      # Label of pod
+    spec:
+      containers:                            # List of container(s) to include on pod
+        - name:  alpineShell                 # Human readable logging 
+          image: ryanwolfsr/alpineShell      # Name of the image on docker.hub to make this container from
+          ports:
+            - containerPort: 3000            # Works with a Service Object to exposes this port to the outside world
