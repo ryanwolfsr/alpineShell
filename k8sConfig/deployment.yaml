@@ -21,7 +21,7 @@ spec:
 apiVersion: apps/v1                          # Each API version defines a different set of 'objects' we can use 
 kind: Deployment                             # Type of Object we're creating (i.e. StatefulSet, ReplicaController, Pod, Service)
 metadata:                               
-  name: alpineShell-deployment               # Name of the deployment
+  name: alpineShell-deployment                # Name of the deployment
 spec:
   replicas: 3                                # How many Pods to run
   selector:
