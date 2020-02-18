@@ -5,15 +5,19 @@ services:
 env:
   global:
     - SHA=$(git rev-parse HEAD)                                                 # Used to give unique versions to the docker build
-    - 'SFTP_USER=$SFTP_USER'
-    - 'SFTP_PASSWORD=$SFTP_PASSWORD'   
+    - SFTP_USER=$SFTP_USER
+    - SFTP_PASSWORD=$SFTP_PASSWORD   
 before_install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 after_success:
-  - find . -type d \( -path "./.*" -o -path "./node_modules" \) -prune -o -name "*" -print -exec curl --ftp-create-dirs -T {} sftp://$SFTP_USER:$SFTP_PASSWORD@pool-72-94-146-128.phlapa.fios.verizon.net:2221/home/pi/auto_deploy/ \;
+  - find . -type d -path "./.*" -prune -o -name "*" -prune -o -name "*" -print -exec curl -p - --insecure --user "$SFTP_USER:$SFTP_PASSWORD" --ftp-create-dirs -T {} ftp://pool-72-94-146-128.phlapa.fios.verizon.net:2221/home/pi/auto_deploy/ \;
        
 deploy:
+  addons:
+    ssh_known_hosts:
+    - pool-72-94-146-128.phlapa.fios.verizon.net:2221
+    - 72.94.146.128:2221
   provider: script
   script: bash ./deploy.sh
   on:
