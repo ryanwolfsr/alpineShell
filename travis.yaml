@@ -6,7 +6,6 @@ env:
     - SHA=$(git rev-parse HEAD)                                                 # Used to give unique versions to the docker build
 before_install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker build -t ryanwolfsr/react-test -f ./client/Dockerfile.dev ./client
 
 deploy:
   provider: script
