@@ -7,7 +7,8 @@ env:
     - SHA=$(git rev-parse HEAD)                                                 # Used to give unique versions to the docker build
     - SFTP_USER=$SFTP_USER
     - SFTP_PASSWORD=$SFTP_PASSWORD   
-before_install:
+before_install: 
+  - openssl aes-256-cbc -K $encrypted_8fc4992d751c_key -iv $encrypted_8fc4992d751c_iv -in rsa_id.enc -out rsa_id -d
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 after_success:
