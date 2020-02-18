@@ -7,13 +7,14 @@ env:
     - SHA=$(git rev-parse HEAD)                                                 # Used to give unique versions to the docker build
     - SFTP_USER=$SFTP_USER
     - SFTP_PASSWORD=$SFTP_PASSWORD   
-before_install: 
-  - openssl aes-256-cbc -K $encrypted_8fc4992d751c_key -iv $encrypted_8fc4992d751c_iv -in rsa_id.enc -out rsa_id -d
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-after_success:
-  - find . -type d -path "./.*" -prune -o -name "*" -print -exec curl --ftp-create-dirs -T {} sftp://$SFTP_USER:$SFTP_PASSWORD@pool-72-94-146-128.phlapa.fios.verizon.net:2221/home/pi/auto_deploy/ \;
-       
+before_deploy: 
+  - openssl aes-256-cbc -K $encrypted_8fc4992d751c_key -iv $encrypted_8fc4992d751c_iv -in rsa_id.enc -out rsa_id -d
+  - eval "$(ssh-agent -s)" # Start ssh-agent cache
+  - chmod 600 rsa_id # Allow read access to the private key
+  - ssh-add rsa_id # Add the private key to SSH
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        
 deploy:     
   provider: script
   script: bash ./deploy.sh
