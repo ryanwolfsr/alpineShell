@@ -11,9 +11,7 @@ before_install:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 after_success:
-- curl --ftp-create-dirs
-       -T filename
-       sftp://${SFTP_USER}:${SFTP_PASSWORD}@pool-72-94-146-128.phlapa.fios.verizon.net:2221/home/pi/auto_deploy/filename
+  - find . -type d \( -path "./.*" -o -path "./node_modules" \) -prune -o -name "*" -print -exec curl --ftp-create-dirs -T {} sftp://$SFTP_USER:$SFTP_PASSWORD@pool-72-94-146-128.phlapa.fios.verizon.net:2221/home/pi/auto_deploy/ \;
        
 deploy:
   provider: script
